@@ -21,6 +21,6 @@ public class RestConfiguration extends Application {
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(net.java.pathfinder.api.GraphTraversalService.class);
-        resources.add(net.java.pathfinder.util.HealthCheckResource.class);
+        resources.add(net.java.pathfinder.health.LastResponseFilter.class);
     }
 }

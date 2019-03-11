@@ -3,9 +3,7 @@ package net.java.cargotracker.infrastructure.routing;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
 public class TransitPath implements Serializable {
 
     private List<TransitEdge> transitEdges;

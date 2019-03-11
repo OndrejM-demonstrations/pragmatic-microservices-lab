@@ -1,20 +1,19 @@
 package net.java.cargotracker.infrastructure.routing;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.json.JsonArray;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import net.java.cargotracker.application.util.JacksonConfigurationContextResolver;
 import net.java.cargotracker.domain.model.cargo.Itinerary;
 import net.java.cargotracker.domain.model.cargo.Leg;
 import net.java.cargotracker.domain.model.cargo.RouteSpecification;
@@ -23,7 +22,8 @@ import net.java.cargotracker.domain.model.location.UnLocode;
 import net.java.cargotracker.domain.model.voyage.VoyageNumber;
 import net.java.cargotracker.domain.model.voyage.VoyageRepository;
 import net.java.cargotracker.domain.service.RoutingService;
-import org.glassfish.jersey.jackson.JacksonFeature;
+import org.eclipse.microprofile.config.Config;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 /**
  * Our end of the routing service. This is basically a data model translation
@@ -38,35 +38,34 @@ public class ExternalRoutingService implements RoutingService {
     private static final Logger LOGGER = Logger.getLogger(
             ExternalRoutingService.class.getName());
 
-    @Resource(name = "pathFinderDiscoveryUrl")
-    private String pathFinderDiscoveryUrl;
-
     // TODO Can I use injection?
     private final Client jaxrsClient = ClientBuilder.newClient();
-    private WebTarget graphTraversalResource;
     @Inject
     private LocationRepository locationRepository;
     @Inject
     private VoyageRepository voyageRepository;
-
-    @PostConstruct
-    public void init() {
-        WebTarget pathFinderDiscoveryResource = jaxrsClient.target(pathFinderDiscoveryUrl);
-
-        JsonArray discoveryData = pathFinderDiscoveryResource
-                .request(MediaType.APPLICATION_JSON).get(JsonArray.class);
-        String address = discoveryData.getJsonObject(0).getString("ServiceAddress");
-        int port = discoveryData.getJsonObject(0).getInt("ServicePort");
-
-        graphTraversalResource = jaxrsClient.target(
-                "http://" + address + ":" + port + "/rest/graph-traversal/shortest-path");
-        graphTraversalResource.register(JacksonConfigurationContextResolver.class);
-        graphTraversalResource.register(JacksonFeature.class);
-    }
-
+    
     @Override
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
+        Config config = ConfigProvider.getConfig();
+        URL url;
+        try {
+            url = config.getValue("discovery.service.pathfinder.url", URL.class);
+        } catch (RuntimeException e) {
+            LOGGER.log(Level.WARNING, "No pathfinder service discovered, returning empty list of itineraries", e);
+            return new ArrayList<>();
+        }
+        WebTarget graphTraversalResource = null;
+        try {
+            URL target = new URL(url, "rest/graph-traversal/shortest-path");
+            Logger.getLogger(ExternalRoutingService.class.getName())
+                    .log(Level.INFO, "URL of a healthy pathfinder service: {0}", target);
+            graphTraversalResource = jaxrsClient.target(target.toURI());
+        } catch (URISyntaxException | MalformedURLException ex) {
+            throw new RuntimeException("Pathfinder URL is malformed: " + url, ex);
+        }
+
         // The RouteSpecification is picked apart and adapted to the external API.
         String origin = routeSpecification.getOrigin().getUnLocode().getIdString();
         String destination = routeSpecification.getDestination().getUnLocode()

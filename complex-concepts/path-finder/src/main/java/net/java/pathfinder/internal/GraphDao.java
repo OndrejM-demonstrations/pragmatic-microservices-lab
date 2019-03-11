@@ -6,13 +6,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import javax.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.faulttolerance.Retry;
 
 @ApplicationScoped
 public class GraphDao implements Serializable {
 
     private final Random random = new Random();
 
+    @Retry(maxRetries = 10)  // retries in case of a "Random failure"    
     public List<String> listLocations() {
+        if (new Random().nextBoolean()) {
+            throw new RuntimeException("Random failure");
+        }
         return new ArrayList<>(Arrays.asList("CNHKG", "AUMEL", "SESTO",
                 "FIHEL", "USCHI", "JNTKO", "DEHAM", "CNSHA", "NLRTM", "SEGOT",
                 "CNHGH", "USNYC", "USDAL"));

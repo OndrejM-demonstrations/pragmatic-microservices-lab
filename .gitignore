@@ -2,3 +2,8 @@
 complex-concepts/cargo-tracker/src/docker/cargo-tracker.war
 
 complex-concepts/path-finder/src/docker/path-finder-1.0-swarm.jar
+
+.classpath
+.project
+.settings/
+target/
