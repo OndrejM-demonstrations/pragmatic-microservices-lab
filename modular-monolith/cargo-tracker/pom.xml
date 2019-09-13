@@ -8,7 +8,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>monolith - cargo-tracker</name>
+    <name>modular monolith - cargo-tracker</name>
     <url>http://cargotracker.java.net</url>
 
     <properties>
@@ -30,39 +30,32 @@
     <dependencies>
         <!-- Java EE API -->
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-application</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>pathfinder</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>batch-job</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
             <scope>provided</scope>
-        </dependency>
-
-        <!-- GlassFish specific dependencies -->
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- The third-party dependencies this application has -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- PrimeFaces dependencies -->
-        <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>5.2</version>
         </dependency>
         <dependency>
             <groupId>org.primefaces.themes</groupId>
             <artifactId>all-themes</artifactId>
             <version>1.0.10</version>
         </dependency>
+
     </dependencies>
 
     <build>
