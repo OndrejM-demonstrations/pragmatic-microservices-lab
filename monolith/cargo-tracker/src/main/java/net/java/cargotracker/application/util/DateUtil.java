@@ -2,6 +2,7 @@ package net.java.cargotracker.application.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -11,6 +12,14 @@ import java.util.Date;
 // TODO Make this a CDI singleton?
 public class DateUtil {
 
+    static final Duration CURRENT_TIME_OFFSET;
+    
+    static {
+        Calendar fixedCurrentTime = Calendar.getInstance();
+        fixedCurrentTime.set(2015, Calendar.MARCH, 13);
+        CURRENT_TIME_OFFSET = Duration.between(fixedCurrentTime.toInstant(), Calendar.getInstance().toInstant());
+    }
+    
     private DateUtil() {
     }
 
@@ -19,11 +28,16 @@ public class DateUtil {
     }
 
     public static Date toDate(String date, String time) {
+        Date parsedDate;
         try {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date + " " + time);
+            parsedDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(date + " " + time);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+        Calendar calDate = Calendar.getInstance();
+        calDate.setTime(parsedDate);
+        Instant dateWithOffset = calDate.toInstant().plus(CURRENT_TIME_OFFSET);
+        return Date.from(dateWithOffset);
     }
 
     public static String getDateFromDateTime(String dateTime) {
