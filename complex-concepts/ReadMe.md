@@ -1,3 +1,23 @@
+config
+ ServiceActiveHealthCheck
+ ExternalRoutingService
+
+discovery
+ ExternalRoutingService
+ JCacheDiscoveryConfigSource
+ org.... service
+
+health
+ ServiceActiveHealthCheck
+
+metrics
+ http://localhost:8888/metrics/application/findShortestPath
+
+fault
+ GraphDao - maxRetries
+
+
+
 Complex Microservices Concepts
 ==============================
 This code demonstrates developing advanced/complex microservices including 

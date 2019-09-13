@@ -48,10 +48,14 @@ public class ExternalRoutingService implements RoutingService {
     @Override
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
+
         Config config = ConfigProvider.getConfig();
+
         URL url;
         try {
+
             url = config.getValue("discovery.service.pathfinder.url", URL.class);
+
         } catch (RuntimeException e) {
             LOGGER.log(Level.WARNING, "No pathfinder service discovered, returning empty list of itineraries", e);
             return new ArrayList<>();
