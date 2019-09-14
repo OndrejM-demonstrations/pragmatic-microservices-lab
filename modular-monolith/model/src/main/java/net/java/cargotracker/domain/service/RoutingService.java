@@ -1,8 +1,6 @@
 package net.java.cargotracker.domain.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -16,6 +14,7 @@ import net.java.cargotracker.domain.model.location.LocationRepository;
 import net.java.cargotracker.domain.model.location.UnLocode;
 import net.java.cargotracker.domain.model.voyage.VoyageNumber;
 import net.java.cargotracker.domain.model.voyage.VoyageRepository;
+import net.java.pathfinder.api.*;
 
 @Stateless
 public class RoutingService {
@@ -32,7 +31,7 @@ public class RoutingService {
     @Inject
     private VoyageRepository voyageRepository;
     @Inject
-    private GraphDao dao;
+    private GraphTraversalService graphTraversalService;
 
     /**
      * @param routeSpecification route specification
@@ -41,57 +40,19 @@ public class RoutingService {
      */
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
-        Date date = nextDate(new Date());
+        // The RouteSpecification is picked apart and adapted to the external API.
+        String origin = routeSpecification.getOrigin().getUnLocode().getIdString();
+        String destination = routeSpecification.getDestination().getUnLocode()
+                .getIdString();
 
-        String originUnLocode = routeSpecification.getOrigin()
-                .getUnLocode().getIdString();
-        String destinationUnLocode = routeSpecification.getDestination()
-                .getUnLocode().getIdString();
+        List<TransitPath> transitPaths = graphTraversalService.findShortestPath(origin, destination);
 
-        List<String> allVertices = dao.listLocations();
-        allVertices.remove(originUnLocode);
-        allVertices.remove(destinationUnLocode);
+        // The returned result is then translated back into our domain model.
+        List<Itinerary> itineraries = new ArrayList<>();
 
-        int candidateCount = getRandomNumberOfCandidates();
-
-        List<Itinerary> itineraries = new ArrayList<>(candidateCount);
-
-        for (int i = 0; i < candidateCount; i++) {
-            allVertices = getRandomChunkOfLocations(allVertices);
-            List<Leg> legs = new ArrayList<>(allVertices.size() - 1);
-            String firstLegTo = allVertices.get(0);
-
-            Date fromDate = nextDate(date);
-            Date toDate = nextDate(fromDate);
-            date = nextDate(toDate);
-
-            legs.add(new Leg(voyageRepository.find(
-                    new VoyageNumber(dao.getVoyageNumber(originUnLocode, firstLegTo))),
-                    routeSpecification.getOrigin(),
-                    locationRepository.find(new UnLocode(firstLegTo)), fromDate, toDate));
-
-            for (int j = 0; j < allVertices.size() - 1; j++) {
-                String current = allVertices.get(j);
-                String next = allVertices.get(j + 1);
-                fromDate = nextDate(date);
-                toDate = nextDate(fromDate);
-                date = nextDate(toDate);
-                legs.add(new Leg(voyageRepository.find(
-                        new VoyageNumber(dao.getVoyageNumber(current, next))),
-                        locationRepository.find(new UnLocode(current)),
-                        locationRepository.find(new UnLocode(next)), fromDate, toDate));
-            }
-
-            String lastLegFrom = allVertices.get(allVertices.size() - 1);
-            fromDate = nextDate(date);
-            toDate = nextDate(fromDate);
-            legs.add(new Leg(voyageRepository.find(new VoyageNumber(
-                    dao.getVoyageNumber(lastLegFrom, destinationUnLocode))),
-                    locationRepository.find(new UnLocode(lastLegFrom)),
-                    routeSpecification.getDestination(), fromDate, toDate));
-
-            Itinerary itinerary = new Itinerary(legs);
-
+        for (TransitPath transitPath : transitPaths) {
+            Itinerary itinerary = toItinerary(transitPath);
+            // Use the specification to safe-guard against invalid itineraries
             if (routeSpecification.isSatisfiedBy(itinerary)) {
                 itineraries.add(itinerary);
             } else {
@@ -100,26 +61,22 @@ public class RoutingService {
             }
         }
 
-        LOGGER.log(Level.INFO, "Path finder service called for {0} to {1}",
-                new Object[]{routeSpecification.getOrigin(),
-                    routeSpecification.getDestination()});
-
         return itineraries;
     }
 
-    private Date nextDate(Date date) {
-        return new Date(date.getTime() + ONE_DAY_MS
-                + (random.nextInt(1000) - 500) * ONE_MIN_MS);
+    private Itinerary toItinerary(TransitPath transitPath) {
+        List<Leg> legs = new ArrayList<>(transitPath.getTransitEdges().size());
+        for (TransitEdge edge : transitPath.getTransitEdges()) {
+            legs.add(toLeg(edge));
+        }
+        return new Itinerary(legs);
     }
 
-    private int getRandomNumberOfCandidates() {
-        return 3 + random.nextInt(3);
-    }
-
-    private List<String> getRandomChunkOfLocations(List<String> allLocations) {
-        Collections.shuffle(allLocations);
-        int total = allLocations.size();
-        int chunk = total > 4 ? 1 + new Random().nextInt(5) : total;
-        return allLocations.subList(0, chunk);
+    private Leg toLeg(TransitEdge edge) {
+        return new Leg(
+                voyageRepository.find(new VoyageNumber(edge.getVoyageNumber())),
+                locationRepository.find(new UnLocode(edge.getFromUnLocode())),
+                locationRepository.find(new UnLocode(edge.getToUnLocode())),
+                edge.getFromDate(), edge.getToDate());
     }
 }

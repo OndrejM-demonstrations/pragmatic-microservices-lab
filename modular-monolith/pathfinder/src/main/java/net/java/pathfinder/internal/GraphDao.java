@@ -1,4 +1,4 @@
-package net.java.cargotracker.domain.service;
+package net.java.pathfinder.internal;
 
 import java.io.Serializable;
 import java.util.ArrayList;
