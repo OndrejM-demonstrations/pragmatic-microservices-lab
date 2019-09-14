@@ -1,8 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:p="http://primefaces.org/ui">
     <ui:composition template="/WEB-INF/templates/common/admin.xhtml">
         <ui:define name="title">Track Cargo</ui:define>
         <ui:define name="content">
@@ -24,10 +23,10 @@
                         <h:panelGroup rendered="#{not empty track.cargo}">
                             <div id="result">
                                 <p>Cargo <strong>#{track.cargo.trackingId}</strong> is currently <strong>#{track.cargo.statusText}</strong></p>
-                                
+
                                 <p>Estimated time of arrival in <strong>#{track.cargo.destination}</strong>: #{track.cargo.eta}</p>
                                 <ui:fragment rendered="#{not empty track.cargo.nextExpectedActivity}"><p>#{track.cargo.nextExpectedActivity}</p></ui:fragment>
-                                
+
                                 <h:panelGroup rendered="#{track.cargo.misdirected}">
                                     <p><i class="fa fa-exclamation-triangle" style="color: #9b2332"></i> Cargo is misdirected.</p>
                                 </h:panelGroup>

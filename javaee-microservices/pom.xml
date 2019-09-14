@@ -8,11 +8,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <name>modular monolith</name>
+    <name>javaee microservices</name>
     <modules>
         <module>cargo-tracker</module>
         <module>core-application</module>
-        <module>pathfinder</module>
+        <module>path-finder</module>
         <module>batch-job</module>
     </modules>
 </project>
