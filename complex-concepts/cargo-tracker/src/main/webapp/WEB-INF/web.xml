@@ -40,8 +40,8 @@
     Can be more operations friendly and help make deployment even faster. -->
     <data-source>
         <name>java:global/jdbc/CargoTrackerDatabase</name>
-        <class-name>org.apache.derby.jdbc.EmbeddedDriver</class-name>
-        <url>jdbc:derby:${webapp.databaseTempDir}/cargo-tracker-database;create=true</url>
+        <class-name>org.h2.jdbcx.JdbcDataSource</class-name>
+        <url>jdbc:h2:${webapp.databaseTempDir}/cargo-tracker-database;;AUTO_SERVER=TRUE</url>
     </data-source>
     <jms-destination>
         <name>java:global/jms/CargoHandledQueue</name>

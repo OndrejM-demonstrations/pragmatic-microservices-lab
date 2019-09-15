@@ -8,10 +8,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <name>complex-concepts</name>
+    <name>MP msvc advanced</name>
     <modules>
         <module>cargo-tracker</module>
+        <module>core-application</module>
         <module>path-finder</module>
+        <module>batch-job</module>
         <module>consul-discovery</module>
         <module>jcache-discovery</module>
     </modules>

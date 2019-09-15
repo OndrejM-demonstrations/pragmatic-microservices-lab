@@ -38,12 +38,13 @@ public class ServiceRegistration {
         try {
         	advertizer.advertize(advert, scheduler);
         } catch (RuntimeException e) {
-        	Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Is consul running?", e);
+        	Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Is service discovery available?", e);
         }
         
+        System.setProperty("discovery.service.pathfinder.url", "pathfinder.url");
         scheduler.scheduleAtFixedRate(() -> {
             Logger.getLogger(this.getClass().getName()).info(() -> {
-                String url = ConfigProvider.getConfig().getValue("discovery.service.pathfinder.url", String.class);
+                String url = ConfigProvider.getConfig().getValue("pathfinder.url", String.class);
                 return "URL of a healthy pathfinder service: " + url;
             });
         }, 1, 5, TimeUnit.SECONDS);

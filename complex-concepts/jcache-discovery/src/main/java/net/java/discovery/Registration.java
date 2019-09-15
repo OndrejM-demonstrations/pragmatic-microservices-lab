@@ -1,6 +1,9 @@
 package net.java.discovery;
 
 import java.io.Serializable;
+import java.net.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Registration implements Serializable {
     private String id;
@@ -54,5 +57,12 @@ public class Registration implements Serializable {
         return this;
     }
     
+    public URI getUri() {
+        try {
+            return new URI("http", null, address, port, contextRoot, null, null);
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
     
 }
