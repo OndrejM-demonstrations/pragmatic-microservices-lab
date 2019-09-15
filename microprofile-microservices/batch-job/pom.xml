@@ -3,26 +3,32 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.java</groupId>
     <version>1.0</version>
-    <artifactId>core-application</artifactId>
+    <artifactId>batch-job</artifactId>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-    <name>javaee microservices - core application</name>
+    <name>MP microservices - batch job</name>
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core-application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Java EE dependency -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- GlassFish specific dependencies -->
+        <!-- MicroProfile dependency -->
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet-core</artifactId>
-            <version>2.0</version>
+            <groupId>org.eclipse.microprofile</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>2.2</version>
+            <type>pom</type>
             <scope>provided</scope>
         </dependency>
 
@@ -32,13 +38,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
             <scope>compile</scope>
-        </dependency>
-
-        <!-- PrimeFaces dependencies -->
-        <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>primefaces</artifactId>
-            <version>5.2</version>
         </dependency>
     </dependencies>
 </project>

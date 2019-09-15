@@ -3,15 +3,17 @@ package net.java.pathfinder.api;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.enterprise.context.RequestScoped;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import net.java.pathfinder.internal.GraphDao;
 
-@RequestScoped
+@Stateless
 @Path("/graph-traversal")
 public class GraphTraversalService {
 
@@ -29,9 +31,8 @@ public class GraphTraversalService {
     @Produces("application/json")
     // TODO Add internationalized messages for constraints.
     public List<TransitPath> findShortestPath(
-            @QueryParam("origin") String originUnLocode,
-            @QueryParam("destination") String destinationUnLocode,
-            @QueryParam("deadline") String deadline) {
+            @NotNull @Size(min = 5, max = 5) @QueryParam("origin") String originUnLocode,
+            @NotNull @Size(min = 5, max = 5) @QueryParam("destination") String destinationUnLocode) {
         Date date = nextDate(new Date());
 
         List<String> allVertices = dao.listLocations();

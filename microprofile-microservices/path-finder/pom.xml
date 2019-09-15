@@ -9,33 +9,52 @@
     <version>1.0</version>
     <packaging>war</packaging>
 
-    <name>path-finder (microprofile-microservices)</name>
+    <name>MP microservices - path-finder</name>
 
     <properties>
-        <version.payara.micro>5.183</version.payara.micro>
-        <version.payara.maven.plugin>1.0.1</version.payara.maven.plugin>
-        <version.docker-maven-plugin>0.24.0</version.docker-maven-plugin>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
+        <version.payara.micro>5.193</version.payara.micro>
+        <version.payara.maven.plugin>1.0.1</version.payara.maven.plugin>
     </properties>
 
     <dependencies>
+        <!-- Java EE dependency -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>8.0</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- MicroProfile dependency -->
         <dependency>
             <groupId>org.eclipse.microprofile</groupId>
             <artifactId>microprofile</artifactId>
-            <version>2.0.1</version>
+            <version>2.2</version>
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
+        <finalName>path-finder</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -63,7 +82,17 @@
                 <version>${version.payara.maven.plugin}</version>
                 <configuration>
                     <payaraVersion>${version.payara.micro}</payaraVersion>
-                    <useUberJar>true</useUberJar>
+                    <!--<useUberJar>true</useUberJar>-->
+                    <commandLineOptions>
+                        <option>
+                            <key>--port</key>
+                            <value>8888</value>
+                        </option>
+                        <option>
+                            <key>--nocluster</key>
+                        </option>
+                    </commandLineOptions>
+                    <deployWar>true</deployWar>
                     <autoDeployEmptyContextRoot>true</autoDeployEmptyContextRoot>
                 </configuration>
                 <executions>
@@ -76,59 +105,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>docker</id>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>${version.docker-maven-plugin}</version>
-                        <configuration>
-                            <images>
-                                <image>
-                                    <alias>${project.artifactId}</alias>
-                                    <name>pragmatic-microservices-lab/${project.artifactId}:${project.version}</name>
-                                    <build>
-                                        <maintainer>Ivar Grimstad (ivar.grimstad@gmail.com)</maintainer>
-                                        <from>payara/micro:${version.payara.micro}</from>
-                                        <assembly>
-                                            <basedir>/opt/payara/deployments</basedir>
-                                            <inline>
-                                                <files>
-                                                    <file>
-                                                        <source>${basedir}/target/${project.build.finalName}.war</source>
-                                                        <destName>ROOT.jar</destName>
-                                                    </file>
-                                                </files>
-                                            </inline>
-                                        </assembly>
-                                        <entryPoint>
-                                            <arg>java</arg>
-                                            <arg>-jar</arg>
-                                            <arg>/opt/payara/payara-micro.jar</arg>
-                                            <arg>--deploymentDir</arg>
-                                            <arg>/opt/payara/deployments</arg>
-                                        </entryPoint>
-                                    </build>
-                                </image>
-                            </images>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
 </project>

@@ -12,10 +12,7 @@
     <url>http://cargotracker.java.net</url>
 
     <properties>
-        <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.hint.j2eeVersion>1.7</netbeans.hint.j2eeVersion>
-        <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
         <webapp.databaseTempDir>/tmp</webapp.databaseTempDir>
     </properties>
 
@@ -28,7 +25,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Java EE API -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-application</artifactId>
@@ -44,12 +40,14 @@
             <artifactId>batch-job</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- Java EE API -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
             <scope>provided</scope>
         </dependency>
+        <!-- other dependencies -->
         <dependency>
             <groupId>org.primefaces.themes</groupId>
             <artifactId>all-themes</artifactId>
@@ -68,9 +66,6 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <compilerArguments>
-                        <endorseddirs>${endorsed.dir}</endorseddirs>
-                    </compilerArguments>
                 </configuration>
             </plugin>
             <plugin>

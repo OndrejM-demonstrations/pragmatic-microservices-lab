@@ -9,12 +9,21 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-    <name>javaee microservices - core application</name>
+    <name>MP microservices - core application</name>
     <dependencies>
+        <!-- Java EE dependency -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>8.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- MicroProfile dependency -->
+        <dependency>
+            <groupId>org.eclipse.microprofile</groupId>
+            <artifactId>microprofile</artifactId>
+            <version>2.2</version>
+            <type>pom</type>
             <scope>provided</scope>
         </dependency>
         

@@ -4,15 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import net.java.cargotracker.domain.model.cargo.Itinerary;
 import net.java.cargotracker.domain.model.cargo.Leg;
 import net.java.cargotracker.domain.model.cargo.RouteSpecification;
@@ -21,6 +14,7 @@ import net.java.cargotracker.domain.model.location.UnLocode;
 import net.java.cargotracker.domain.model.voyage.VoyageNumber;
 import net.java.cargotracker.domain.model.voyage.VoyageRepository;
 import net.java.cargotracker.domain.service.RoutingService;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 /**
  * Our end of the routing service. This is basically a data model translation
@@ -31,25 +25,17 @@ import net.java.cargotracker.domain.service.RoutingService;
 @Stateless
 public class ExternalRoutingService implements RoutingService {
 
-    // TODO Use injection instead?
-    private static final Logger LOGGER = Logger.getLogger(
-            ExternalRoutingService.class.getName());
-
-    @Resource(name = "graphTraversalUrl")
-    private String graphTraversalUrl;
-
-    // TODO Can I use injection?
-    private final Client jaxrsClient = ClientBuilder.newClient();
-    private WebTarget graphTraversalResource;
     @Inject
     private LocationRepository locationRepository;
     @Inject
     private VoyageRepository voyageRepository;
+    // TODO Use injection instead?
+    private static final Logger LOGGER = Logger.getLogger(
+            ExternalRoutingService.class.getName());
 
-    @PostConstruct
-    public void init() {
-        graphTraversalResource = jaxrsClient.target(graphTraversalUrl);
-    }
+    @Inject
+    @RestClient
+    private GraphTraversalService graphTraversalService;
 
     @Override
     public List<Itinerary> fetchRoutesForSpecification(
@@ -59,12 +45,7 @@ public class ExternalRoutingService implements RoutingService {
         String destination = routeSpecification.getDestination().getUnLocode()
                 .getIdString();
 
-        List<TransitPath> transitPaths = graphTraversalResource
-                .queryParam("origin", origin)
-                .queryParam("destination", destination)
-                .request(MediaType.APPLICATION_JSON)
-                .get(new GenericType<List<TransitPath>>() {
-                });
+        List<TransitPath> transitPaths = graphTraversalService.findShortestPath(origin, destination);
 
         // The returned result is then translated back into our domain model.
         List<Itinerary> itineraries = new ArrayList<>();

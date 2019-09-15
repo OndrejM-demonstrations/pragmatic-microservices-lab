@@ -9,7 +9,7 @@
         <!-- URL configuration in XML while the rest of the component metadata
         is in annoations -->
         <session>
-            <ejb-name>ExternalRoutingService</ejb-name>
+            <ejb-name>ExternalGraphTraversalService</ejb-name>
             <env-entry>
                 <env-entry-name>graphTraversalUrl</env-entry-name>
                 <env-entry-type>java.lang.String</env-entry-type>

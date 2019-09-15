@@ -4,15 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
 import net.java.cargotracker.domain.model.cargo.Itinerary;
 import net.java.cargotracker.domain.model.cargo.Leg;
 import net.java.cargotracker.domain.model.cargo.RouteSpecification;
@@ -31,12 +24,6 @@ import net.java.cargotracker.domain.service.RoutingService;
 @Stateless
 public class ExternalRoutingService implements RoutingService {
 
-    @Resource(name = "graphTraversalUrl")
-    private String graphTraversalUrl;
-
-    // TODO Can I use injection?
-    private final Client jaxrsClient = ClientBuilder.newClient();
-    private WebTarget graphTraversalResource;
     @Inject
     private LocationRepository locationRepository;
     @Inject
@@ -45,11 +32,9 @@ public class ExternalRoutingService implements RoutingService {
     private static final Logger LOGGER = Logger.getLogger(
             ExternalRoutingService.class.getName());
 
-    @PostConstruct
-    public void init() {
-        graphTraversalResource = jaxrsClient.target(graphTraversalUrl);
-    }
-
+    @Inject
+    private ExternalGraphTraversalService graphTraversalService;
+    
     @Override
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
@@ -58,12 +43,7 @@ public class ExternalRoutingService implements RoutingService {
         String destination = routeSpecification.getDestination().getUnLocode()
                 .getIdString();
 
-        List<TransitPath> transitPaths = graphTraversalResource
-                .queryParam("origin", origin)
-                .queryParam("destination", destination)
-                .request(MediaType.APPLICATION_JSON_TYPE)
-                .get(new GenericType<List<TransitPath>>() {
-                });
+        List<TransitPath> transitPaths = graphTraversalService.findShortestPath(origin, destination);
 
         // The returned result is then translated back into our domain model.
         List<Itinerary> itineraries = new ArrayList<>();

@@ -18,7 +18,6 @@ import net.java.cargotracker.domain.model.cargo.TrackingId;
 import net.java.cargotracker.domain.model.handling.HandlingEvent;
 import net.java.cargotracker.domain.model.location.UnLocode;
 import net.java.cargotracker.domain.model.voyage.VoyageNumber;
-import net.java.cargotracker.interfaces.handling.HandlingEventRegistrationAttempt;
 
 @Dependent
 @Named("EventItemReader")
