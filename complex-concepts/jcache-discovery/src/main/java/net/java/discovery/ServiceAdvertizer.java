@@ -7,8 +7,6 @@ import org.eclipse.microprofile.config.ConfigProvider;
 
 public class ServiceAdvertizer {
 
-    SelfHealthService serviceHealth = new SelfHealthService();
-
     public void advertize(ServiceAdvertisement advertisement) {
         advertize(advertisement, Executors.newSingleThreadScheduledExecutor());
     }
