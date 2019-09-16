@@ -5,7 +5,7 @@
 
     <groupId>net.java</groupId>
     <artifactId>cargo-tracker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>3.0</version>
     <packaging>war</packaging>
 
     <name>javaee microservices - cargo-tracker</name>
@@ -28,17 +28,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-application</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pathfinder</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>batch-job</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Java EE API -->
         <dependency>

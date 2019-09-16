@@ -36,7 +36,7 @@ public class ServiceAdvertizer {
 
 	public void refreshAdvertisement(ServiceAdvertisement advertisement) {
 		try {
-			Logger.getLogger(ServiceAdvertizer.class.getName()).log(Level.SEVERE,
+			Logger.getLogger(ServiceAdvertizer.class.getName()).log(Level.INFO,
 					"Sending ping to consul");
 			try {
 				ConsulClient.build().agentClient().checkTtl(idFromAdvert(advertisement), State.PASS, null);
@@ -60,20 +60,12 @@ public class ServiceAdvertizer {
 		return advertisement.getName() + ":" + serviceAddress + ":" + servicePort;
 	}
 
-	private static Integer getPortFromAdvert(ServiceAdvertisement advertisment, Config config) {
-		Integer servicePort = advertisment.getPort();
-		if (servicePort == null) {
-			servicePort = ServiceInfo.getServicePort(config);
-		}
-		return servicePort;
-	}
+    private static Integer getPortFromAdvert(ServiceAdvertisement advertisment, Config config) {
+        return ServiceInfo.getServicePort(config, advertisment.getPort());
+    }
 
-	private static String getAddressFromAdvert(ServiceAdvertisement advertisment, Config config) {
-		String serviceAddress = advertisment.getAddress();
-		if (serviceAddress == null) {
-			serviceAddress = ServiceInfo.getServiceAddress(config);
-		}
-		return serviceAddress;
-	}
+    private static String getAddressFromAdvert(ServiceAdvertisement advertisment, Config config) {
+        return ServiceInfo.getServiceAddress(config, advertisment.getAddress());
+    }
 
 }

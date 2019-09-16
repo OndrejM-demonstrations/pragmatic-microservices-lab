@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.java</groupId>
     <artifactId>complex-concepts</artifactId>
-    <version>1.0</version>
+    <version>5.0</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +20,9 @@
     <profiles>
         <profile>
             <id>consul-discovery</id>
+        </profile>
+        <profile>
+            <id>docker</id>
         </profile>
     </profiles>
 </project>

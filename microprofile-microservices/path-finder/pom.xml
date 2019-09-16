@@ -6,7 +6,7 @@
 
     <groupId>net.java</groupId>
     <artifactId>path-finder</artifactId>
-    <version>1.0</version>
+    <version>4.0</version>
     <packaging>war</packaging>
 
     <name>MP microservices - path-finder</name>

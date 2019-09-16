@@ -53,19 +53,11 @@ public class ServiceAdvertizer {
     }
 
     private static Integer getPortFromAdvert(ServiceAdvertisement advertisment, Config config) {
-        Integer servicePort = advertisment.getPort();
-        if (servicePort == null) {
-            servicePort = ServiceInfo.getServicePort(config);
-        }
-        return servicePort;
+        return ServiceInfo.getServicePort(config, advertisment.getPort());
     }
 
     private static String getAddressFromAdvert(ServiceAdvertisement advertisment, Config config) {
-        String serviceAddress = advertisment.getAddress();
-        if (serviceAddress == null) {
-            serviceAddress = ServiceInfo.getServiceAddress(config);
-        }
-        return serviceAddress;
+        return ServiceInfo.getServiceAddress(config, advertisment.getAddress());
     }
 
 }

@@ -5,7 +5,7 @@
 
     <groupId>net.java</groupId>
     <artifactId>cargo-tracker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>5.0</version>
     <packaging>war</packaging>
 
     <name>MP msvc advanced - cargo-tracker</name>
@@ -14,6 +14,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <webapp.databaseTempDir>/tmp</webapp.databaseTempDir>
+        <version.docker-maven-plugin>0.24.0</version.docker-maven-plugin>
+        <version.payara.server>5.193</version.payara.server>
     </properties>
 
     <!-- We need to use the PrimeFaces repository -->
@@ -28,17 +30,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core-application</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pathfinder</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>batch-job</artifactId>
-            <version>1.0</version>
+            <version>${project.version}</version>
         </dependency>
         <!-- Java EE API -->
         <dependency>
@@ -64,6 +61,52 @@
         </dependency>
 
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>${version.docker-maven-plugin}</version>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <alias>${project.artifactId}</alias>
+                                    <name>pragmatic-microservices-lab/${project.artifactId}:${project.version}</name>
+                                    <build>
+                                        <from>payara/server-full:${version.payara.server}</from>
+                                        <assembly>
+                                            <basedir>/opt/payara/deployments</basedir>
+                                            <inline>
+                                                <files>
+                                                    <file>
+                                                        <source>${basedir}/target/${project.build.finalName}.war</source>
+                                                        <destName>${project.build.finalName}.war</destName>
+                                                    </file>
+                                                </files>
+                                            </inline>
+                                        </assembly>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+    </profiles>
 
     <build>
         <finalName>cargo-tracker</finalName>
