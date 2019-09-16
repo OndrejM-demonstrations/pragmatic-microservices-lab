@@ -5,16 +5,6 @@ services:
     ports:
     - "8080:8080"
     environment:
-        CONSUL_URL: "http://discovery:8500"
+        pathfinder_url: "http://path-finder:8080"
   path-finder:
     image: pragmatic-microservices-lab/path-finder:5.0
-    environment:
-        CONSUL_URL: "http://discovery:8500"
-        HTTP_ADDRESS: "path-finder"
-        HTTP_PORT: "8080"
-  discovery:
-    image: consul
-    ports:
-    - "8500:8500"
-volumes:
-  logvolume01: {}
