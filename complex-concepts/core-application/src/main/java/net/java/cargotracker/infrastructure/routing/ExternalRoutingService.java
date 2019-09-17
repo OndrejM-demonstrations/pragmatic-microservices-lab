@@ -1,11 +1,11 @@
 package net.java.cargotracker.infrastructure.routing;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import net.java.cargotracker.domain.model.cargo.Itinerary;
@@ -18,6 +18,8 @@ import net.java.cargotracker.domain.model.voyage.VoyageRepository;
 import net.java.cargotracker.domain.service.RoutingService;
 import org.eclipse.microprofile.config.Config;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -38,10 +40,6 @@ public class ExternalRoutingService implements RoutingService {
     private static final Logger LOGGER = Logger.getLogger(
             ExternalRoutingService.class.getName());
     @Inject
-    @ConfigProperty(name = "pathfinder.url")
-    private Provider<URL> pathFinderUrlProvider;
-    
-    @Inject
     Config config;
 
     private GraphTraversalService retrieveGraphTraversalService() {
@@ -50,7 +48,13 @@ public class ExternalRoutingService implements RoutingService {
                 .build(GraphTraversalService.class);
     }
 
-    @Override
+    public List<Itinerary> getEmptyRoutesList(
+            RouteSpecification routeSpecification) {
+        return Collections.emptyList();
+    }
+
+    @Retry
+    @Fallback(fallbackMethod = "getEmptyRoutesList")
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
         // The RouteSpecification is picked apart and adapted to the external API.

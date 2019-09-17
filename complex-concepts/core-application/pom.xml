@@ -54,9 +54,6 @@
         <profiles>
         <profile>
             <id>jcache-discovery</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>

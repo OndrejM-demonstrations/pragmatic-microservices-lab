@@ -1,7 +1,6 @@
 package net.java.cargotracker.infrastructure.routing;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
@@ -14,6 +13,8 @@ import net.java.cargotracker.domain.model.location.UnLocode;
 import net.java.cargotracker.domain.model.voyage.VoyageNumber;
 import net.java.cargotracker.domain.model.voyage.VoyageRepository;
 import net.java.cargotracker.domain.service.RoutingService;
+import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 /**
@@ -37,7 +38,14 @@ public class ExternalRoutingService implements RoutingService {
     @RestClient
     private GraphTraversalService graphTraversalService;
 
+    public List<Itinerary> getEmptyListOfRoutes(
+            RouteSpecification routeSpecification) {
+        return Collections.emptyList();
+    }
+    
     @Override
+    @Retry
+    @Fallback(fallbackMethod = "getEmptyListOfRoutes")
     public List<Itinerary> fetchRoutesForSpecification(
             RouteSpecification routeSpecification) {
         // The RouteSpecification is picked apart and adapted to the external API.
