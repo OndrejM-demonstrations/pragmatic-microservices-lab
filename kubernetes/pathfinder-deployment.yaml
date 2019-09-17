@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pathfinder
+spec:
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: pathfinder
+  template:
+    metadata:
+      labels:
+        app: pathfinder
+    spec:
+      containers:
+        - name: pathfinder
+          image: fra.ocir.io/frwjmf7vcn8t/payara-microservices/path-finder:5.0
+          imagePullPolicy: Always
+          ports:
+          - name: pathfinder
+            containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /rest/ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 1  
+      imagePullSecrets:
+        - name: payara-microservices

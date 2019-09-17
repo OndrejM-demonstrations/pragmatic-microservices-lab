@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cargo-tracker
+  labels:
+    app: cargo-tracker
+spec:
+  containers:
+    - name: cargo-tracker
+      image: fra.ocir.io/frwjmf7vcn8t/payara-microservices/cargo-tracker:5.0
+      imagePullPolicy: Always
+      ports:
+      - name: cargo-tracker
+        containerPort: 8080
+        protocol: TCP
+      env:
+      - name: pathfinder_url
+        value: "http://pathfinder:8080"
+  imagePullSecrets:
+    - name: payara-microservices
